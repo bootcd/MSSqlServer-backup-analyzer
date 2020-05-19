@@ -3,7 +3,9 @@ import pyodbc
 # vars
 
 db_name = "msdb"
-server_name = ""
+
+
+server_name = "localhost"
 username = ""
 password = ""
 
