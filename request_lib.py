@@ -1,7 +1,7 @@
 # This func returns dictionary with data for POST request
 
 
-def get_postrequest_data(database, common_status, base_backup_stats, backup_type):
+def get_postrequest_data(database, common_status, base_backup_stats, backup_type, client_name):
     # This func returns error string from error list
 
     def geterrorstring(errors):
@@ -24,7 +24,7 @@ def get_postrequest_data(database, common_status, base_backup_stats, backup_type
                          'backup_status': base_backup_stats['status'],
                          'power_of_compressing': base_backup_stats['power_of_compressing'],
                          'size': base_backup_stats['size'], 'duration': base_backup_stats['duration'],
-                         'backup_date': base_backup_stats['date'], 'client_name': 'test client',
+                         'backup_date': base_backup_stats['date'], 'client_name': client_name,
                          'backup_type': backup_type, 'backup_file_status': base_backup_stats['filestatus'],
                          'errors': geterrorstring(base_backup_stats['errors'])}
 

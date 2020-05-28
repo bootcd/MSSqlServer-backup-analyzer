@@ -69,6 +69,7 @@ def getstatus(backupdict):
                 base_backup_stats['size'] = base_backup_item_status['filestatus']
 
             base_backup_stats['filestatus'] = base_backup_item_status['filestatus']
+            base_backup_stats['power_of_compressing'] = base_backup_item_status['filestatus']
 
         if base_data_item == "backup_start_date":
 

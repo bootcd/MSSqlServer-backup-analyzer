@@ -37,17 +37,19 @@ def getDatabaseList(type):
 
 
 def getdataitem(backup_items, databaseList):
-    systembasetable = "msdb.dbo.backupset"
     db_backup_dict = {}
     cursor = db_connect(server_name, db_name).cursor()
 
     for key, value in databaseList.items():
         db_backup_item_dict = {}
-
         database = key
         media_set_id = value
         for backup_item in backup_items:
-            query = "SELECT " + backup_item + " FROM " + systembasetable + " Where database_name='" + database + "' AND  media_set_id='" + media_set_id + "'; "
+            if backup_item == "physical_device_name":
+                systembasetable = "msdb.dbo.backupmediafamily"
+            else:
+                systembasetable = "msdb.dbo.backupset"
+            query = "SELECT " + backup_item + " FROM " + systembasetable + " WHERE  media_set_id='" + media_set_id + "'; "
             cursor.execute(query)
             dataitems = cursor.fetchall()
 

@@ -1,4 +1,8 @@
+import json
+
 import requests
+
+from sys import argv
 
 from dataset import *
 
@@ -9,8 +13,10 @@ from request_lib import *
 # vars
 
 backuptypes = {'D': "Полный", 'L': "Журнал Транзакций", 'I': "Разностный"}
-backup_item_list = ['physical_device_name', 'backup_start_date', 'backup_finish_date', 'compressed_backup_size', 'backup_size',
+backup_item_list = ['physical_device_name', 'backup_start_date', 'backup_finish_date', 'compressed_backup_size',
+                    'backup_size',
                     'recovery_model', 'media_set_id']
+client_name = argv[1]
 
 # constructing lists of databases that haves various types of backups (full, journal, increment)
 # !!!!! rewrite this shit to normal function with returns by 'type' !!!!!
@@ -23,32 +29,37 @@ for backuptype in backuptypes.keys():
     if backuptype == 'I':
         db_with_inc_backup_list = getDatabaseList(backuptype)
 
-
 # getting dictionaries with needful data
 
 full_backup_bases = getdataitem(backup_item_list, db_with_full_backup_list)
 journal_backup_bases = getdataitem(backup_item_list, db_with_journal_backup_list)
 inc_backup_bases = getdataitem(backup_item_list, db_with_inc_backup_list)
 
-# just readable view. Need pack to func!!!!
-
-# print("Full")
-# for key, value in full_backup_bases.items():
-#     print(key, ": ", value, "/n")
-#
-# print("journal")
-# for key, value in journal_backup_bases.items():
-#     print(key, ": ", value, "/n")
-#
-# print("increment")
-# for key, value in inc_backup_bases.items():
-#     print(key, ": ", value, "/n")
-
 for key, value in full_backup_bases.items():
-
     common_status = getCommonStatus(value, backup_item_list)
     base_backup_stats = getstatus(value)
 
-    post_data = get_postrequest_data(key, common_status, base_backup_stats, 'D')
+    post_data = get_postrequest_data(key, common_status, base_backup_stats, 'D', client_name)
 
-    requests.post("http://localhost/data.php", data=post_data)
+for key, value in full_backup_bases.items():
+    common_status = getCommonStatus(value, backup_item_list)
+    base_backup_stats = getstatus(value)
+
+    post_data = get_postrequest_data(key, common_status, base_backup_stats, 'D', client_name)
+
+    requests.post("url", data=post_data)
+
+#### JSON Works ####
+
+# Open the output file for json output
+json_output_file = open("json_output.txt", "w")
+
+# Purge the output file
+json_output_file.truncate()
+
+# Write datat to JSON file
+
+json_output_file.write(json.dumps(post_data) + "\n")
+
+# Close JSON output file
+json_output_file.close()
