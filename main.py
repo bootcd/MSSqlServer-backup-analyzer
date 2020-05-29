@@ -35,21 +35,7 @@ full_backup_bases = getdataitem(backup_item_list, db_with_full_backup_list)
 journal_backup_bases = getdataitem(backup_item_list, db_with_journal_backup_list)
 inc_backup_bases = getdataitem(backup_item_list, db_with_inc_backup_list)
 
-for key, value in full_backup_bases.items():
-    common_status = getCommonStatus(value, backup_item_list)
-    base_backup_stats = getstatus(value)
-
-    post_data = get_postrequest_data(key, common_status, base_backup_stats, 'D', client_name)
-
-for key, value in full_backup_bases.items():
-    common_status = getCommonStatus(value, backup_item_list)
-    base_backup_stats = getstatus(value)
-
-    post_data = get_postrequest_data(key, common_status, base_backup_stats, 'D', client_name)
-
-    requests.post("url", data=post_data)
-
-#### JSON Works ####
+#### JSON Works  - truncate file ####
 
 # Open the output file for json output
 json_output_file = open("json_output.txt", "w")
@@ -57,9 +43,20 @@ json_output_file = open("json_output.txt", "w")
 # Purge the output file
 json_output_file.truncate()
 
-# Write datat to JSON file
 
-json_output_file.write(json.dumps(post_data) + "\n")
 
-# Close JSON output file
-json_output_file.close()
+
+
+for key, value in full_backup_bases.items():
+    common_status = getCommonStatus(value, backup_item_list)
+    base_backup_stats = getstatus(value)
+
+    post_data = get_postrequest_data(key, common_status, base_backup_stats, 'D', client_name)
+    requests.post("url", data=post_data)
+
+    # Write datat to JSON file
+
+    json_output_file.write(json.dumps(post_data) + "\n")
+
+    # Close JSON output file
+    json_output_file.close()
