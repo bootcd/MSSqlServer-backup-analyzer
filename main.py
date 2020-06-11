@@ -1,4 +1,4 @@
-import json
+﻿import json
 
 import requests
 
@@ -43,20 +43,26 @@ json_output_file = open("json_output.txt", "w")
 # Purge the output file
 json_output_file.truncate()
 
-
-
-
-
 for key, value in full_backup_bases.items():
-    common_status = getCommonStatus(value, backup_item_list)
-    base_backup_stats = getstatus(value)
+    metadata_status = get_metadata_status(value, backup_item_list)
+    base_backup_stats = get_base_backup_stats(value)
 
-    post_data = get_postrequest_data(key, common_status, base_backup_stats, 'D', client_name)
-    requests.post("url", data=post_data)
+    post_data = get_postrequest_data(key, metadata_status, base_backup_stats, 'D', client_name)
+    requests.post("http://zabbix.ekord.ru/datareceiver.php", data=post_data)
 
     # Write datat to JSON file
 
     json_output_file.write(json.dumps(post_data) + "\n")
 
-    # Close JSON output file
-    json_output_file.close()
+# Close JSON output file
+json_output_file.close()
+
+maintplan_history = get_maintplan_history()
+print(maintplan_history)
+for maintplan_name, maintplan_data in maintplan_history.items():
+    requests.post("http://zabbix.ekord.ru/maintplan_status.php", data={'plan_name': maintplan_name,
+                                                                 'plan_status': maintplan_data['status'],
+                                                                 'plan_last_date': maintplan_data['plan_last_date'],
+                                                                 'client_name': client_name,'plan_last_date_finish': maintplan_data['plan_last_date_finish'] })
+
+

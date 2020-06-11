@@ -1,26 +1,19 @@
 # This func returns dictionary with data for POST request
 
 
-def get_postrequest_data(database, common_status, base_backup_stats, backup_type, client_name):
+def get_postrequest_data(database, metadata_status, base_backup_stats, backup_type, client_name):
     # This func returns error string from error list
 
     def geterrorstring(errors):
-        if type(errors) == list:
-            errorstring = ""
-            for error in errors:
-                for er, value in error.items():
-                    errorstr = er + ": " + value + "; "
-                    errorstring = errorstring + errorstr
-            return errorstring
+        errorstring = ";".join(errors)
 
-        else:
-            return errors
+        return errorstring
 
     # Dictionary with needful data for POST request
 
-    request_item_dict = {'database': database, 'common_status': common_status['status'],
-                         'backup_item_status': common_status['item_status'],
-                         'backup_data_status': common_status['data_status'],
+    request_item_dict = {'database': database, 'common_status': metadata_status['status'],
+                         'backup_item_status': metadata_status['item_status'],
+                         'backup_data_status': metadata_status['data_status'],
                          'backup_status': base_backup_stats['status'],
                          'power_of_compressing': base_backup_stats['power_of_compressing'],
                          'size': base_backup_stats['size'], 'duration': base_backup_stats['duration'],
@@ -29,3 +22,5 @@ def get_postrequest_data(database, common_status, base_backup_stats, backup_type
                          'errors': geterrorstring(base_backup_stats['errors'])}
 
     return request_item_dict
+
+#def get_maintplan_errors_request()
