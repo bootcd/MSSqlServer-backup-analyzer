@@ -2,21 +2,19 @@
 import datetime
 from db_connect import *
 
-
 ### vars
 
 now = datetime.datetime.now()
+
 
 # functions for geting needful data
 ##################################
 #################################
 
-# function returns dictionary with lists of databases
-# structured by 'type' of backup (full, journal, increment)
+# This function returns lists of user databases (without system databases)
 
-def getDatabaseList(type):
-    databaselist = []
-    databasedict = {}
+def get_database_list():
+    database_list = []
 
     cursor = db_connect(server_name, db_name).cursor()
     cursor.execute("SELECT name FROM sys.databases WHERE name<>'tempdb' and name<>'master' and "
@@ -24,9 +22,15 @@ def getDatabaseList(type):
     databases = cursor.fetchall()
 
     for database in databases:
-        databaselist.append(database[0])
+        database_list.append(database[0])
 
-    for database in databaselist:
+    return database_list
+
+
+def get_db_mediaset_id_dict(database_list, type):
+    db_mediasetid_dict = {}
+
+    for database in database_list:
         query = "select MAX(m.media_set_id) from msdb.dbo.backupset b full join msdb.dbo.backupmediafamily m on " \
                 "b.media_set_id = m.media_set_id where b.database_name = '" + database + "' " \
                                                                                          "and m.device_type = '2' and " \
@@ -38,14 +42,16 @@ def getDatabaseList(type):
             pass
         else:
             for media_set_id in media_set_ids:
-                databasedict.update({database: str(media_set_id[0])})
-    return databasedict
+                db_mediasetid_dict.update({database: str(media_set_id[0])})
+    return db_mediasetid_dict
 
 
-def get_maintplan_history():
+# This func returns dict of maintplans history dictionaries.
+
+def get_maintplan_history_dict():
     maintplan_name_id_dict = {}
     maintplan_history = {}
-    maintplans_history = {}
+    maintplans_history_dict = {}
     maintplan_errors_list = []
     cursor = db_connect(server_name, db_name).cursor()
     cursor.execute("select name, id from msdb.dbo.sysmaintplan_plans;")
@@ -54,9 +60,10 @@ def get_maintplan_history():
         plan_name = maintplan_name_id[0]
         plan_id = maintplan_name_id[1]
         maintplan_name_id_dict[plan_name] = plan_id
-        cursor.execute("select TOP(1) succeeded, task_detail_id, start_time, end_time from msdb.dbo.sysmaintplan_log where plan_id='" + plan_id + "' order by  start_time DESC;")
+        cursor.execute(
+            "select TOP(1) succeeded, task_detail_id, start_time, end_time from msdb.dbo.sysmaintplan_log where plan_id='" + plan_id + "' order by  start_time DESC;")
         maintplan_succeeded = cursor.fetchall()
-        if len(maintplan_succeeded) !=0:
+        if len(maintplan_succeeded) != 0:
             plan_last_date = str(maintplan_succeeded[0][2])
             plan_last_date_finish = str(maintplan_succeeded[0][3])
             print("plan_last_date", plan_last_date)
@@ -64,7 +71,8 @@ def get_maintplan_history():
                 maintplan_history['status'] = "ok"
             else:
                 task_detail_id = maintplan_succeeded[0][1]
-                cursor.execute("select error_message from msdb.dbo.sysmaintplan_logdetail where task_detail_id = '" + task_detail_id + "';")
+                cursor.execute(
+                    "select error_message from msdb.dbo.sysmaintplan_logdetail where task_detail_id = '" + task_detail_id + "';")
                 # cursor.execute("select error_message from msdb.dbo.sysmaintplan_logdetail where task_detail_id = '75E82C0F-19C6-48FE-8AB3-A43EBAE4B72E';")
                 maintplan_errors = cursor.fetchall()
                 maintplan_error_string = str(maintplan_errors[2][0]).split("\r\n")[0]
@@ -79,14 +87,15 @@ def get_maintplan_history():
             maintplan_history['plan_last_date'] = str(now)
             maintplan_history['plan_last_date_finish'] = str(now)
             pass
-        maintplans_history[plan_name] = copy.deepcopy(maintplan_history)
-    return maintplans_history
+        maintplans_history_dict[plan_name] = copy.deepcopy(maintplan_history)
+    return maintplans_history_dict
 
-# function returns dictionary 'db_backup_dict' with list of dictionaries
+
+# function returns dictionary 'whole_backup_dict' with list of dictionaries
 # marked with names of database. Inner dictionaries haves 'db_backup_item' = 'needful value'
 
-def getdataitem(backup_items, databaseList):
-    db_backup_dict = {}
+def get_whole_backup_dict(backup_items, databaseList):
+    whole_backup_dict = {}
     cursor = db_connect(server_name, db_name).cursor()
 
     for key, value in databaseList.items():
@@ -107,6 +116,6 @@ def getdataitem(backup_items, databaseList):
             else:
                 for rawdataitem in dataitems:
                     db_backup_item_dict[backup_item] = str(rawdataitem[0])
-        db_backup_dict[database] = copy.deepcopy(db_backup_item_dict)
+        whole_backup_dict[database] = copy.deepcopy(db_backup_item_dict)
 
-    return db_backup_dict
+    return whole_backup_dict
