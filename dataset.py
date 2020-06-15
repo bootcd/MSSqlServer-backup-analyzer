@@ -27,14 +27,16 @@ def get_database_list():
     return database_list
 
 
-def get_db_mediaset_id_dict(database_list, type):
+def get_db_mediaset_id_dict(database_list, backup_type):
     db_mediasetid_dict = {}
 
     for database in database_list:
         query = "select MAX(m.media_set_id) from msdb.dbo.backupset b full join msdb.dbo.backupmediafamily m on " \
-                "b.media_set_id = m.media_set_id where b.database_name = '" + database + "' " \
-                                                                                         "and m.device_type = '2' and " \
-                                                                                         "b.type = '" + type + "' "
+                "b.media_set_id = m.media_set_id where b.database_name = '" + database + "' and m.device_type = '2' " \
+                                                                                         "and b.type = '" + \
+                backup_type + "' ; "
+
+        cursor = db_connect(server_name, db_name).cursor()
         cursor.execute(query)
 
         media_set_ids = cursor.fetchall()

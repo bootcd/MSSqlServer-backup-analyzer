@@ -41,7 +41,7 @@ def get_file_status(file):
 
 def get_power_of_compressing(size, compressed_size):
     if size != compressed_size:
-        power_of_compressing = int(size) / int(compressed_size)
+        power_of_compressing = int(size) / float(compressed_size)
         power_of_compressing = round(power_of_compressing, 2)
     else:
         power_of_compressing = 0

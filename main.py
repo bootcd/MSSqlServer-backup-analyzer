@@ -12,5 +12,5 @@ from run import *
 # like python main.py MICROSOFT D
 
 
-if __name__ == __main__:
+if __name__ == '__main__':
     run(argv[1], argv[2])
