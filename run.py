@@ -65,11 +65,13 @@ def run(arg1, arg2):
 
     # For each maintplan and it's data...
     for maintplan_name, subplans in maintplan_history.items():
-        for subplan_name, subplan_history in subplans:
+        for subplan_name, subplan_history in subplans.items():
+
+            print(subplan_name)
 
             #... POST request to WEB server
-            requests.post("http://zabbix.ekord.ru/maintplan_status.php", data={'plan_name': maintplan_name,
-                                                                               'subplan_name': subplan_history['subplan_name'],
+            requests.post("http://10.1.0.43/zabbix/maintplan_status.php", data={'plan_name': maintplan_name,
+                                                                               'subplan_name': subplan_name,
                                                                                'subplan_status': subplan_history['status'],
                                                                                'subplan_last_date': subplan_history[
                                                                                    'subplan_last_date'],
