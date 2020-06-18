@@ -51,45 +51,72 @@ def get_db_mediaset_id_dict(database_list, backup_type):
 # This func returns dict of maintplans history dictionaries.
 
 def get_maintplan_history_dict():
-    maintplan_name_id_dict = {}
-    maintplan_history = {}
     maintplans_history_dict = {}
-    maintplan_errors_list = []
+    maintplan_name_id_dict = {}
+    subplan_history = {}
+    subplans_history_dict = {}
+    subplan_errors_list = []
     cursor = db_connect(server_name, db_name).cursor()
     cursor.execute("select name, id from msdb.dbo.sysmaintplan_plans;")
     maintplan_name_ids = cursor.fetchall()
+
     for maintplan_name_id in maintplan_name_ids:
         plan_name = maintplan_name_id[0]
+        print(plan_name)
         plan_id = maintplan_name_id[1]
         maintplan_name_id_dict[plan_name] = plan_id
-        cursor.execute(
-            "select TOP(1) succeeded, task_detail_id, start_time, end_time from msdb.dbo.sysmaintplan_log where plan_id='" + plan_id + "' order by  start_time DESC;")
-        maintplan_succeeded = cursor.fetchall()
-        if len(maintplan_succeeded) != 0:
-            plan_last_date = str(maintplan_succeeded[0][2])
-            plan_last_date_finish = str(maintplan_succeeded[0][3])
-            print("plan_last_date", plan_last_date)
-            if maintplan_succeeded[0][0] == True:
-                maintplan_history['status'] = "ok"
-            else:
-                task_detail_id = maintplan_succeeded[0][1]
-                cursor.execute(
-                    "select error_message from msdb.dbo.sysmaintplan_logdetail where task_detail_id = '" + task_detail_id + "';")
-                # cursor.execute("select error_message from msdb.dbo.sysmaintplan_logdetail where task_detail_id = '75E82C0F-19C6-48FE-8AB3-A43EBAE4B72E';")
-                maintplan_errors = cursor.fetchall()
-                maintplan_error_string = str(maintplan_errors[2][0]).split("\r\n")[0]
-                maintplan_errors_list.append(maintplan_error_string)
-                maintplan_errors_string = "\n".join(maintplan_errors_list)
-                maintplan_history['status'] = maintplan_errors_string
-            maintplan_history['plan_last_date'] = plan_last_date
-            maintplan_history['plan_last_date_finish'] = plan_last_date_finish
 
-        else:
-            maintplan_history['status'] = "Не выполняется!"
-            maintplan_history['plan_last_date'] = str(now)
-            maintplan_history['plan_last_date_finish'] = str(now)
-            pass
-        maintplans_history_dict[plan_name] = copy.deepcopy(maintplan_history)
+        ###########################################
+
+        cursor.execute("select subplan_id, subplan_name from msdb.dbo.sysmaintplan_subplans where plan_id='" + plan_id + "';")
+
+        subplan_id_name = cursor.fetchall()
+
+        for subplan in subplan_id_name:
+            subplan_id_name = cursor.fetchall()
+            subplan_name = str(subplan[1])
+            subplan_id = str(subplan[0])
+
+            cursor.execute(
+                "select TOP(1) task_detail_id from msdb.dbo.sysmaintplan_log where subplan_id = '" + subplan_id + "' "
+                                                                                                                  "order by start_time DESC")
+            task_detail_ids = cursor.fetchall()
+
+            for task_detail_id in task_detail_ids:
+                # print(task_detail_id[0])
+                cursor.execute("select succeeded, start_time, end_time from msdb.dbo.sysmaintplan_log where "
+                               "task_detail_id='" + task_detail_id[0] + "';")
+                subplan_succeeded = cursor.fetchall()
+
+                if len(subplan_succeeded) != 0:
+                    succeded = str(subplan_succeeded[0][0])
+                    subplan_last_date = str(subplan_succeeded[0][1])
+                    subplan_last_date_finish = str(subplan_succeeded[0][2])
+
+                    cursor.execute("select error_message from msdb.dbo.sysmaintplan_logdetail where task_detail_id = '" + task_detail_id[0] + "';")
+                    subplan_errors = cursor.fetchall()
+
+                    for i in range(len(subplan_errors)):
+                        subplan_error_string = str(subplan_errors[i][0]).split("\r\n")[0]
+                        subplan_errors_list.append(subplan_error_string)
+                        subplan_errors_string = "".join(subplan_errors_list)
+
+                    if subplan_errors_string == "":
+                        subplan_history['status'] = "ok"
+                    else:
+                        subplan_history['status'] = subplan_errors_string
+
+                    subplan_history['subplan_last_date'] = subplan_last_date
+                    subplan_history['subplan_last_date_finish'] = subplan_last_date_finish
+
+                else:
+                    subplan_history['status'] = "Не выполняется!"
+                    subplan_history['subplan_last_date'] = "Нет данных"
+                    subplan_history['subplan_last_date_finish'] = "Нет данных"
+                subplans_history_dict[subplan_name] = copy.deepcopy(subplan_history)
+        maintplans_history_dict[plan_name] = copy.deepcopy(subplans_history_dict)
+    print(maintplans_history_dict)
+
     return maintplans_history_dict
 
 

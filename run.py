@@ -64,12 +64,15 @@ def run(arg1, arg2):
     maintplan_history = get_maintplan_history_dict()
 
     # For each maintplan and it's data...
-    for maintplan_name, maintplan_data in maintplan_history.items():
-        # ... POST request to WEB server
-        requests.post("http://zabbix.ekord.ru/maintplan_status.php", data={'plan_name': maintplan_name,
-                                                                           'plan_status': maintplan_data['status'],
-                                                                           'plan_last_date': maintplan_data[
-                                                                               'plan_last_date'],
-                                                                           'client_name': client_name,
-                                                                           'plan_last_date_finish': maintplan_data[
-                                                                               'plan_last_date_finish']})
+    for maintplan_name, subplans in maintplan_history.items():
+        for subplan_name, subplan_history in subplans:
+
+            #... POST request to WEB server
+            requests.post("http://zabbix.ekord.ru/maintplan_status.php", data={'plan_name': maintplan_name,
+                                                                               'subplan_name': subplan_history['subplan_name'],
+                                                                               'subplan_status': subplan_history['status'],
+                                                                               'subplan_last_date': subplan_history[
+                                                                                   'subplan_last_date'],
+                                                                               'client_name': client_name,
+                                                                               'subplan_last_date_finish': subplan_history[
+                                                                                   'subplan_last_date_finish']})
