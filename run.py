@@ -63,18 +63,19 @@ def run(arg1, arg2):
     # Getting dictionary with maintplans history {maintplan_name: maintplan_data{parameter: value}}
     maintplan_history = get_maintplan_history_dict()
 
-    # For each maintplan and it's data...
-    for maintplan_name, subplans in maintplan_history.items():
-        for subplan_name, subplan_history in subplans.items():
+    if backup_type == "l":
+        # For each maintplan and it's data...
+        for maintplan_name, subplans in maintplan_history.items():
+            for subplan_name, subplan_history in subplans.items():
 
-            print(subplan_name)
+                print(subplan_name)
 
-            #... POST request to WEB server
-            requests.post("http://10.1.0.43/zabbix/maintplan_status.php", data={'plan_name': maintplan_name,
-                                                                               'subplan_name': subplan_name,
-                                                                               'subplan_status': subplan_history['status'],
-                                                                               'subplan_last_date': subplan_history[
-                                                                                   'subplan_last_date'],
-                                                                               'client_name': client_name,
-                                                                               'subplan_last_date_finish': subplan_history[
-                                                                                   'subplan_last_date_finish']})
+                #... POST request to WEB server
+                requests.post("http://10.1.0.43/zabbix/maintplan_status.php", data={'plan_name': maintplan_name,
+                                                                                   'subplan_name': subplan_name,
+                                                                                   'subplan_status': subplan_history['status'],
+                                                                                   'subplan_last_date': subplan_history[
+                                                                                       'subplan_last_date'],
+                                                                                   'client_name': client_name,
+                                                                                   'subplan_last_date_finish': subplan_history[
+                                                                                       'subplan_last_date_finish']})
