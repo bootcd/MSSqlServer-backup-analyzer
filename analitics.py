@@ -78,8 +78,7 @@ def get_backup_status(file, backup_duration_time, backup_size):
         backup_status['status'] = 'not ok!'
 
     if backup_duration_time == 0:
-        backup_status['status'] = "warning!"
-        errors.append("duration status: not ok!")
+        backup_status['status'] = "ok"
 
     if backup_size == 0:
         errors.append("file zero size!")
