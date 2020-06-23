@@ -73,6 +73,7 @@ def get_backup_status(file_status, backup_duration_time, backup_size):
 
     if file_status == "ok":
         backup_status['file_status'] = "ok"
+        backup_status['status'] = 'ok!'
     else:
         errors.append(file_status)
         backup_status['status'] = 'not ok!'
