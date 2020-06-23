@@ -63,7 +63,7 @@ def run(arg1, arg2):
     # Getting dictionary with maintplans history {maintplan_name: maintplan_data{parameter: value}}
     maintplan_history = get_maintplan_history_dict()
 
-    if backup_type == "l":
+    if backup_type == "L":
         # For each maintplan and it's data...
         for maintplan_name, subplans in maintplan_history.items():
             for subplan_name, subplan_history in subplans.items():
