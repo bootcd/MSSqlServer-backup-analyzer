@@ -92,20 +92,21 @@ def get_maintplan_history_dict():
                     subplan_last_date = str(subplan_succeeded[0][1])
                     subplan_last_date_finish = str(subplan_succeeded[0][2])
 
-                    cursor.execute(
-                        "select error_message from msdb.dbo.sysmaintplan_logdetail where task_detail_id = '" +
-                        task_detail_id[0] + "';")
-                    subplan_errors = cursor.fetchall()
+                    if succeded == "False":
 
-                    for i in range(len(subplan_errors)):
-                        subplan_error_string = str(subplan_errors[i][0]).split("\r\n")[0]
-                        subplan_errors_list.append(subplan_error_string)
-                        subplan_errors_string = "".join(subplan_errors_list)
+                        cursor.execute(
+                            "select error_message from msdb.dbo.sysmaintplan_logdetail where task_detail_id = '" +
+                            task_detail_id[0] + "';")
+                        subplan_errors = cursor.fetchall()
 
-                    if subplan_errors_string == "":
-                        subplan_history['status'] = "ok"
-                    else:
+                        for i in range(len(subplan_errors)):
+                            subplan_error_string = str(subplan_errors[i][0]).split("\r\n")[0]
+                            subplan_errors_list.append(subplan_error_string)
+                            subplan_errors_string = "".join(subplan_errors_list)
                         subplan_history['status'] = subplan_errors_string
+
+                    else:
+                        subplan_history['status'] = "ok"
 
                     subplan_history['subplan_last_date'] = subplan_last_date
                     subplan_history['subplan_last_date_finish'] = subplan_last_date_finish
@@ -116,7 +117,6 @@ def get_maintplan_history_dict():
                     subplan_history['subplan_last_date_finish'] = "Нет данных"
                 subplans_history_dict[subplan_name] = copy.deepcopy(subplan_history)
         maintplans_history_dict[plan_name] = copy.deepcopy(subplans_history_dict)
-
     return maintplans_history_dict
 
 
