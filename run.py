@@ -52,8 +52,6 @@ def run(arg1, arg2):
         # POST request to WEB server
         requests.post("http://zabbix.ekord.ru/datareceiver.php", data=post_request_data_dict)
 
-        print(post_request_data_dict)
-
         # Write data to JSON file
         json_output_file.write(json.dumps(post_request_data_dict) + "\n")
 
@@ -67,8 +65,6 @@ def run(arg1, arg2):
         # For each maintplan and it's data...
         for maintplan_name, subplans in maintplan_history.items():
             for subplan_name, subplan_history in subplans.items():
-                print(subplan_name)
-
                 # ... POST request to WEB server
                 requests.post("http://10.1.0.43/zabbix/maintplan_status.php", data={'plan_name': maintplan_name,
                                                                                     'subplan_name': subplan_name,

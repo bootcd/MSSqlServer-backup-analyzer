@@ -62,7 +62,6 @@ def get_maintplan_history_dict():
 
     for maintplan_name_id in maintplan_name_ids:
         plan_name = maintplan_name_id[0]
-        print(plan_name)
         plan_id = maintplan_name_id[1]
         maintplan_name_id_dict[plan_name] = plan_id
 
@@ -84,7 +83,6 @@ def get_maintplan_history_dict():
             task_detail_ids = cursor.fetchall()
 
             for task_detail_id in task_detail_ids:
-                # print(task_detail_id[0])
                 cursor.execute("select succeeded, start_time, end_time from msdb.dbo.sysmaintplan_log where "
                                "task_detail_id='" + task_detail_id[0] + "';")
                 subplan_succeeded = cursor.fetchall()
@@ -118,7 +116,6 @@ def get_maintplan_history_dict():
                     subplan_history['subplan_last_date_finish'] = "Нет данных"
                 subplans_history_dict[subplan_name] = copy.deepcopy(subplan_history)
         maintplans_history_dict[plan_name] = copy.deepcopy(subplans_history_dict)
-    print(maintplans_history_dict)
 
     return maintplans_history_dict
 
