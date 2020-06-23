@@ -1,18 +1,16 @@
-
 # Program level import
 from sys import argv
 from dataset import *
 from analitics import *
 from request_lib import *
 
-def run(arg1, arg2):
 
+def run(arg1, arg2):
     # System level import
     import json
     import requests
 
     ####### VARIABLES ########
-
     client_name = argv[1]
     backup_type = argv[2]
     backup_item_set = ('physical_device_name',
@@ -54,6 +52,8 @@ def run(arg1, arg2):
         # POST request to WEB server
         requests.post("http://zabbix.ekord.ru/datareceiver.php", data=post_request_data_dict)
 
+        print(post_request_data_dict)
+
         # Write data to JSON file
         json_output_file.write(json.dumps(post_request_data_dict) + "\n")
 
@@ -67,15 +67,17 @@ def run(arg1, arg2):
         # For each maintplan and it's data...
         for maintplan_name, subplans in maintplan_history.items():
             for subplan_name, subplan_history in subplans.items():
-
                 print(subplan_name)
 
-                #... POST request to WEB server
+                # ... POST request to WEB server
                 requests.post("http://10.1.0.43/zabbix/maintplan_status.php", data={'plan_name': maintplan_name,
-                                                                                   'subplan_name': subplan_name,
-                                                                                   'subplan_status': subplan_history['status'],
-                                                                                   'subplan_last_date': subplan_history[
-                                                                                       'subplan_last_date'],
-                                                                                   'client_name': client_name,
-                                                                                   'subplan_last_date_finish': subplan_history[
-                                                                                       'subplan_last_date_finish']})
+                                                                                    'subplan_name': subplan_name,
+                                                                                    'subplan_status': subplan_history[
+                                                                                        'status'],
+                                                                                    'subplan_last_date':
+                                                                                        subplan_history[
+                                                                                            'subplan_last_date'],
+                                                                                    'client_name': client_name,
+                                                                                    'subplan_last_date_finish':
+                                                                                        subplan_history[
+                                                                                            'subplan_last_date_finish']})

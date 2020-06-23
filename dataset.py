@@ -66,14 +66,15 @@ def get_maintplan_history_dict():
         plan_id = maintplan_name_id[1]
         maintplan_name_id_dict[plan_name] = plan_id
 
+        subplans_history_dict = {}
         ###########################################
 
-        cursor.execute("select subplan_id, subplan_name from msdb.dbo.sysmaintplan_subplans where plan_id='" + plan_id + "';")
+        cursor.execute(
+            "select subplan_id, subplan_name from msdb.dbo.sysmaintplan_subplans where plan_id='" + plan_id + "';")
 
         subplan_id_name = cursor.fetchall()
 
         for subplan in subplan_id_name:
-            subplan_id_name = cursor.fetchall()
             subplan_name = str(subplan[1])
             subplan_id = str(subplan[0])
 
@@ -93,7 +94,9 @@ def get_maintplan_history_dict():
                     subplan_last_date = str(subplan_succeeded[0][1])
                     subplan_last_date_finish = str(subplan_succeeded[0][2])
 
-                    cursor.execute("select error_message from msdb.dbo.sysmaintplan_logdetail where task_detail_id = '" + task_detail_id[0] + "';")
+                    cursor.execute(
+                        "select error_message from msdb.dbo.sysmaintplan_logdetail where task_detail_id = '" +
+                        task_detail_id[0] + "';")
                     subplan_errors = cursor.fetchall()
 
                     for i in range(len(subplan_errors)):

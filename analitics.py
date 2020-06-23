@@ -67,18 +67,18 @@ def get_backup_duration_time(start_date, finish_date):
     return backup_duration_time
 
 
-def get_backup_status(file, backup_duration_time, backup_size):
-    backup_status = {'file_status': get_file_status(file), 'status': "ok"}
+def get_backup_status(file_status, backup_duration_time, backup_size):
+    backup_status = {}
     errors = []
 
-    if backup_status['file_status'] == "ok":
-        pass
+    if file_status == "ok":
+        backup_status['file_status'] = "ok"
     else:
-        errors.append(backup_status['file_status'])
+        errors.append(file_status)
         backup_status['status'] = 'not ok!'
 
     if backup_duration_time == 0:
-        backup_status['status'] = "ok"
+        pass
 
     if backup_size == 0:
         errors.append("file zero size!")
@@ -99,7 +99,7 @@ def get_base_backup_stats(backup_dict):
     backup_duration_time = get_backup_duration_time(backup_dict['backup_start_date'], backup_dict['backup_finish_date'])
     power_of_compressing = get_power_of_compressing(size, compressed_size)
     file_status = get_file_status(file)
-    backup_status = get_backup_status(file, backup_duration_time, size)
+    backup_status = get_backup_status(file_status, backup_duration_time, size)
 
     if len(backup_status['errors']) == 0:
         backup_status['errors'].append("no errors")
